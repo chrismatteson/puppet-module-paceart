@@ -91,7 +91,7 @@ class paceart::prereqs (
     source      => $source,
     admin_user  => $admin_user,
     db_instance => 'Paceart_Database',
-    sa_pass     => $sq_pass,
+    sa_pass     => $sa_pass,
     db_name     => 'Paceart_Database',
     require     => Class['paceart::extract'],
   }
