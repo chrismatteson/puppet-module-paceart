@@ -56,9 +56,14 @@ class paceart::sql (
     require     => Class['paceart::sql::extract'],
   }
 
+  file { 'C:\tmp':
+    ensure => directory,
+  }
+
   file { 'C:\tmp\mcertreq.inf':
     ensure  => file,
     content => template('paceart/mcertreq.inf'),
+    require => File['C:\tmp'],
   }
 
   exec { 'create csr':
