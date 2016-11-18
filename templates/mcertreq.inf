@@ -5,7 +5,7 @@ Signature="$Windows NT$"
 
 [NewRequest]
 ;Change to your,country code, company name and common name 
-Subject = "C=US, O=Kaiser, CN=<% @fqdn %>"
+Subject = "C=US, O=Kaiser, CN=<%= @fqdn %>"
 
 KeySpec = 1
 KeyLength = 2048

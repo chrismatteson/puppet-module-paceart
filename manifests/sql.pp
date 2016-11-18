@@ -62,7 +62,7 @@ class paceart::sql (
   }
 
   exec { 'create csr':
-    command     => 'C:\Windows\system32\certreq -new C:\tmp\mcertreq.inf C:\tmp\certreq.mcertreq',
+    command     => 'C:\Windows\System32\certreq.exe -new C:\tmp\mcertreq.inf C:\tmp\certreq.mcertreq',
     refreshonly => true,
     subscribe   => File['C:\tmp\mcertreq.inf'],
   }
