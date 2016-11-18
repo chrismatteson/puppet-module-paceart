@@ -1,4 +1,4 @@
-class paceart::extract (
+class paceart::sql::extract (
   $installer,
   $filename,
   $iso_drive,
@@ -8,7 +8,7 @@ class paceart::extract (
   $iso = grep(["${installer}"], '.iso')
 
   if empty($iso) == false {
-    class { 'paceart::mount':
+    class { 'paceart::sql::mount':
       iso => $filename,
       iso_drive => $iso_drive,
     }

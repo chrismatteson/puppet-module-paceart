@@ -1,5 +1,5 @@
 # This class is used to mount an ISO containing the SQL Server 2014 Code.
-class paceart::mount (
+class paceart::sql::mount (
   $iso,
   $iso_drive,
 ) {

@@ -1,38 +1,59 @@
-# Class to install SQL Server, set its configuration, create an
-# instance, as well as a sample DB.
 class paceart::sql (
-  $source,
-  $admin_user,
-  $db_instance,
-  $sa_pass,
-  $db_name
+  $mount_iso=true,
+  $iso_drive='Q',
+  $dbsource = 'http://care.dlservice.microsoft.com/dl/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe',
+  $stagingowner='BUILTIN\Administrators',
+  $admin_user = 'vagrant',
+  $sa_pass = 'Secure_Pass!',
 ) {
-  reboot { 'before install':
-      when => pending,
+
+  $filename = staging_parse($dbsource, 'filename')
+  $installer = "${::staging_windir}\\${module_name}\\${filename}"
+  staging::file { $filename:
+    source => $dbsource,
   }
 
-  service { 'wuauserv':
-    ensure => running,
-    enable => true,
-    before => Windowsfeature['Net-Framework-Core'],
+  acl { "${::staging_windir}\\${module_name}" :
+    permissions => [
+      {
+        identity => 'Everyone',
+        rights => [ 'full' ]
+      },
+      {
+        identity => $stagingowner,
+        rights => [ 'full' ]
+      },
+    ],
+    require => Staging::File[$filename],
   }
 
-  windowsfeature { 'Net-Framework-Core': }
+  $extract = grep(["${installer}"], '.exe')
+  $iso = grep(["${installer}"], '.iso')
 
-  sqlserver_instance{ $db_instance:
-    ensure                => present,
-    features              => ['SQLEngine','Replication'],
-    source                => $source,
-    security_mode         => 'SQL',
-    sa_pwd                => $sa_pass,
-    sql_sysadmin_accounts => [$admin_user],
+  if empty($iso) == false {
+    $installsource = "${iso_drive}:\\"
   }
-  sqlserver_features { 'Management_Studio':
-    source   => $source,
-    features => ['SSMS'],
+  elsif empty($extract) {
+    $installsource = $dbsource
   }
-  sqlserver::config{ $db_instance:
-    admin_user => 'sa',
-    admin_pass => $sa_pass,
+  else {
+    $installsource = chop(chop(chop(chop($installer))))
   }
+
+  class { 'paceart::sql::extract':
+    installer => $installer,
+    filename  => $filename,
+    iso_drive => $iso_drive,
+    require   => Acl["${::staging_windir}\\${module_name}"],
+  }
+
+  class { 'paceart::sql::sqlinstall':
+    source      => $source,
+    admin_user  => $admin_user,
+    db_instance => 'Paceart_Database',
+    sa_pass     => $sa_pass,
+    db_name     => 'Paceart_Database',
+    require     => Class['paceart::extract'],
+  }
+
 }
