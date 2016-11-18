@@ -48,12 +48,22 @@ class paceart::sql (
   }
 
   class { 'paceart::sql::sqlinstall':
-    source      => $source,
+    source      => $installsource,
     admin_user  => $admin_user,
     db_instance => 'Paceart_Database',
     sa_pass     => $sa_pass,
     db_name     => 'Paceart_Database',
-    require     => Class['paceart::extract'],
+    require     => Class['paceart::sql::extract'],
   }
 
+  file { 'C:\tmp\mcertreq.inf':
+    ensure  => file,
+    content => template('paceart/mcertreq.inf'),
+  }
+
+  exec { 'create csr':
+    command     => 'C:\Windows\system32\certreq -new C:\tmp\mcertreq.inf C:\tmp\certreq.mcertreq',
+    refreshonly => true,
+    subscribe   => File['C:\tmp\mcertreq.inf'],
+  }
 }

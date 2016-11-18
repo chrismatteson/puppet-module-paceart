@@ -1,6 +1,6 @@
 # Class to install SQL Server, set its configuration, create an
 # instance, as well as a sample DB.
-class paceart::sql (
+class paceart::sql::sqlinstall (
   $source,
   $admin_user,
   $db_instance,
